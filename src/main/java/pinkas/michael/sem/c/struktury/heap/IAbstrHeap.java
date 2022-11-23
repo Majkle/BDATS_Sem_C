@@ -1,15 +1,14 @@
 package pinkas.michael.sem.c.struktury.heap;
 
-
 import java.util.Iterator;
 
-public interface IAbstrHeap<T> {
+public interface IAbstrHeap<T extends Comparable<T>> {
     /**
      * Vybuduje levostrannou haldu z vloženého pole. Halda bude obsahovat největší prvek jako prioritní.
      *
-     * @param zamky zamky pro vložení
+     * @param data data pro vložení
      */
-    void vybuduj(T[] zamky);
+    void vybuduj(T[] data);
 
     /**
      * Přebuduje haldu. až na to, že to mám v plánu dělat během insertu, nebo nemám? non sense. ale ok. doable
