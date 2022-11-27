@@ -19,8 +19,8 @@ public class AbstrHeapTest {
     private final TestData T1 = new TestData(1);
     private final TestData T2 = new TestData(2);
     private final TestData T3 = new TestData(3);
-    private final TestData T4 = new TestData(3);
-    private final TestData T5 = new TestData(3);
+    private final TestData T4 = new TestData(4);
+    private final TestData T5 = new TestData(5);
 
     @Before
     public void setUp() {
@@ -35,11 +35,9 @@ public class AbstrHeapTest {
 
     private boolean jeOcekavanyObsahFronty(TestData[] ocekavany, AbstrHeap<TestData> vysledek) {
         Iterator<TestData> iterator = vysledek.iterator(null);
-        for (int i = 0; i < ocekavany.length; i++) {
 
-            System.out.println(ocekavany[i]);
+        for (int i = 0; i < ocekavany.length; i++) {
             if (ocekavany[i].compareTo(iterator.next()) != 0) {
-                System.out.println("xd");
                 return false;
             }
         }
@@ -57,7 +55,7 @@ public class AbstrHeapTest {
 
         abstrHeap.vybuduj(data);
 
-        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T0, T1, T2}, abstrHeap));
+        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T2, T1, T0}, abstrHeap));
     }
 
     @Test
@@ -70,7 +68,7 @@ public class AbstrHeapTest {
 
         abstrHeap.vybuduj(data);
 
-        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T1, T2, T3}, abstrHeap));
+        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T2, T1, T0}, abstrHeap));
     }
 
     @Test
@@ -83,7 +81,7 @@ public class AbstrHeapTest {
 
         abstrHeap.vybuduj(data);
 
-        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T1, T2, T3}, abstrHeap));
+        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T2, T1, T0}, abstrHeap));
     }
 
     @Test
@@ -99,7 +97,7 @@ public class AbstrHeapTest {
 
         abstrHeap.vybuduj(data);
 
-        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T0, T1, T2, T3, T4, T5}, abstrHeap));
+        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T5, T4, T3, T2, T1, T0}, abstrHeap));
     }
 
     @Test
@@ -115,7 +113,7 @@ public class AbstrHeapTest {
 
         abstrHeap.vybuduj(data);
 
-        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T0, T1, T2, T3, T4, T5}, abstrHeap));
+        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T5, T4, T3, T2, T1, T0}, abstrHeap));
     }
 
     @Test
@@ -131,7 +129,8 @@ public class AbstrHeapTest {
 
         abstrHeap.vybuduj(data);
 
-        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T0, T1, T2, T3, T4, T5}, abstrHeap));
+
+        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T5, T4, T3, T2, T1, T0}, abstrHeap));
     }
 
     @Test
@@ -146,7 +145,7 @@ public class AbstrHeapTest {
 
         abstrHeap.vloz(T3);
 
-        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T0, T1, T2,T3}, abstrHeap));
+        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T0, T1, T2, T3}, abstrHeap));
     }
 
     @Test
@@ -161,7 +160,7 @@ public class AbstrHeapTest {
 
         abstrHeap.vloz(T0);
 
-        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T0, T1, T2,T3}, abstrHeap));
+        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T0, T1, T2, T3}, abstrHeap));
     }
 
     @Test
@@ -176,7 +175,7 @@ public class AbstrHeapTest {
 
         abstrHeap.vloz(T2);
 
-        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T0, T1, T2,T3}, abstrHeap));
+        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T0, T1, T2, T3}, abstrHeap));
     }
 
     @Test
@@ -193,7 +192,7 @@ public class AbstrHeapTest {
 
         abstrHeap.vloz(T5);
 
-        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T0, T1, T2, T3, T4, T5}, abstrHeap));
+        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T5, T4, T3, T2, T1, T0}, abstrHeap));
     }
 
     @Test
@@ -210,7 +209,7 @@ public class AbstrHeapTest {
 
         abstrHeap.vloz(T3);
 
-        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T0, T1, T2, T3, T4, T5}, abstrHeap));
+        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T5, T4, T2, T1, T0}, abstrHeap));
     }
 
     @Test
@@ -227,7 +226,7 @@ public class AbstrHeapTest {
 
         abstrHeap.vloz(T0);
 
-        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T0, T1, T2, T3, T4, T5}, abstrHeap));
+        assertTrue(jeOcekavanyObsahFronty(new TestData[]{T5, T4, T3, T2, T1}, abstrHeap));
     }
 
     //TODO iterator
