@@ -6,34 +6,34 @@ import pinkas.michael.sem.c.pamatky.Pamatky;
 import pinkas.michael.sem.c.pamatky.eTypKey;
 import pinkas.michael.sem.c.struktury.bvs.eTypProhl;
 import pinkas.michael.sem.c.struktury.heap.AbstrHeap;
+import pinkas.michael.sem.c.struktury.heap.AbstrHeapException;
 import pinkas.michael.sem.c.struktury.heap.IAbstrHeap;
+import pinkas.michael.sem.c.util.Komparatory;
 import pinkas.michael.sem.c.util.Soubor;
 import pinkas.michael.sem.c.util.ZamekGenerator;
 import pinkas.michael.sem.c.util.ZamekMapy;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Iterator;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class Operace {
     private final Consumer<String> msgInfo;
     private final Consumer<String> msgError;
     private final IPamatky pamatky;
-    private final IAbstrHeap priorotniFronta;
+    private final IAbstrHeap<Zamek> priorotniFronta;
+
 
     public Operace(Consumer<String> msgInfo, Consumer<String> msgError) {
         this.msgInfo = msgInfo;
         this.msgError = msgError;
 
         this.pamatky = new Pamatky();
-        this.priorotniFronta = new AbstrHeap();
+        this.priorotniFronta = new AbstrHeap<>(Komparatory.komparatorGPS);
     }
 
     private void info(String msg) {
@@ -135,17 +135,70 @@ public class Operace {
     /*-----*/
 
     public void vybuduj() {
-        Zamek[] zamky = (Zamek[]) StreamSupport.stream(Spliterators.spliteratorUnknownSize(pamatky.vytvorIterator(eTypProhl.SIRKA), Spliterator.ORDERED), false).toArray();
+        Zamek[] zamky = StreamSupport.stream(Spliterators.spliteratorUnknownSize(pamatky.vytvorIterator(eTypProhl.SIRKA), Spliterator.ORDERED), false).toArray(Zamek[]::new);
+
         priorotniFronta.vybuduj(zamky);
     }
 
-    public void prebudujFrontu(){
+    public void prebudujFrontu() {
         priorotniFronta.prebuduj();
-
-        info("Fronta byla přebudován");
     }
 
-    public void zrusFrontu(){
+    public void zrusFrontu() {
         priorotniFronta.zrus();
+    }
+
+    public void vlozDoFronty(Zamek zamek) {
+        try {
+            priorotniFronta.vloz(zamek);
+            info("Zámek byl vložen do fronty");
+        } catch (AbstrHeapException e) {
+            error(e.getMessage());
+        }
+    }
+
+    public void odeberMax() {
+        Zamek max = priorotniFronta.odeberMax();
+        if (max == null) {
+            info("Prioritní fronta je prázdná");
+        } else {
+            info("Odebraný zámek: " + max);
+        }
+    }
+
+    public void zpristupniMax() {
+        Zamek max = priorotniFronta.zpristupniMax();
+        if (max == null) {
+            info("Prioritní fronta je prázdná");
+        } else {
+            info("Zpřístupněný zámek: " + max);
+        }
+    }
+
+    public void importDatPrioritniFronta(String soubor) {
+        try {
+            Soubor.nacti(Path.of(soubor), ZamekMapy.txtRadekNaZamek()).forEachOrdered(priorotniFronta::vloz);
+            info("Data byla načtena");
+        } catch (IOException e) {
+            error("Nastala chyba při načítání dat");
+        }
+    }
+
+    public void exportDatPrioritniFronta(String soubor) {
+        try {
+            Soubor.uloz(Path.of(soubor),
+                    StreamSupport.stream(Spliterators.spliteratorUnknownSize(
+                                    priorotniFronta.iterator(pinkas.michael.sem.c.struktury.heap.eTypProhl.SIRKA), Spliterator.ORDERED),
+                            false),
+                    ZamekMapy.zamekNaTxtRadek());
+
+            info("Data byla uložena");
+        } catch (IOException e) {
+            error("Nastala chyba při ukládání dat");
+        }
+    }
+
+    public Iterator<Zamek> iteratorPrioritniFronta() {
+        return priorotniFronta.iterator(pinkas.michael.sem.c.struktury.heap.eTypProhl.SIRKA);
     }
 }

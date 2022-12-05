@@ -1,16 +1,20 @@
 package pinkas.michael.sem.c.struktury.heap;
 
-import pinkas.michael.sem.c.struktury.bvs.AbstrTable;
-import pinkas.michael.sem.c.struktury.bvs.AbstrTableException;
 import pinkas.michael.sem.c.struktury.lifo.AbstrLifo;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class AbstrHeap<T extends Comparable<T>> implements IAbstrHeap<T> {
+public class AbstrHeap<T> implements IAbstrHeap<T> {
 
     private T[] prioritniFronta;
+    private Comparator<T> komparator;
+
+    public AbstrHeap(Comparator<T> komparator) {
+        this.komparator = komparator;
+    }
 
     @Override
     public void vybuduj(T[] zamky) {
@@ -46,12 +50,12 @@ public class AbstrHeap<T extends Comparable<T>> implements IAbstrHeap<T> {
         }
 
         if (_jePrazdny()) {
-            prioritniFronta = (T[]) new Comparable[]{vkladany};
+            prioritniFronta = (T[]) new Object[]{vkladany};
         } else {
             prioritniFronta = Arrays.copyOf(prioritniFronta, prioritniFronta.length + 1);
 
             int iZarazeni = 0;
-            while (prioritniFronta[iZarazeni].compareTo(vkladany) > 0) {
+            while (komparator.compare(prioritniFronta[iZarazeni], vkladany) > 0) {
                 iZarazeni++;
                 if (iZarazeni == prioritniFronta.length - 1) {
                     break;
@@ -90,7 +94,12 @@ public class AbstrHeap<T extends Comparable<T>> implements IAbstrHeap<T> {
 
     @Override
     public Iterator<T> iterator(eTypProhl typProhlidky) {
+        if (_jePrazdny()) {
+            return null;
+        }
+
         Iterator<T> it;
+
         switch (typProhlidky) {
             case SIRKA -> it = Arrays.stream(prioritniFronta).iterator();
             case HLOUBKA -> it = new Iterator<T>() {
@@ -166,20 +175,20 @@ public class AbstrHeap<T extends Comparable<T>> implements IAbstrHeap<T> {
 
     // To heapify a subtree rooted with node i which is
     // an index in arr[]. n is size of heap
-    private void heapify(T pole[], int velikostPole, int aktualniKoren) {
+    private void heapify(T[] pole, int velikostPole, int aktualniKoren) {
         int iNejmensi = aktualniKoren; // Initialize largest as root
         int iLevy = 2 * aktualniKoren + 1; // left = 2*i + 1
         int iPravy = 2 * aktualniKoren + 2; // right = 2*i + 2
 
-        //TODO comparator
-
         // If left child is larger than root
-        if (iLevy < velikostPole && pole[iLevy].compareTo(pole[iNejmensi]) < 0)
+        if (iLevy < velikostPole && komparator.compare(pole[iLevy], pole[iNejmensi]) < 0) {
             iNejmensi = iLevy;
+        }
 
         // If right child is larger than largest so far
-        if (iPravy < velikostPole && pole[iPravy].compareTo(pole[iNejmensi]) < 0)
+        if (iPravy < velikostPole && komparator.compare(pole[iPravy], pole[iNejmensi]) < 0) {
             iNejmensi = iPravy;
+        }
 
         // If largest is not root
         if (iNejmensi != aktualniKoren) {

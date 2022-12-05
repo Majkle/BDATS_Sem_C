@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import pinkas.michael.sem.c.TestData;
 
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -24,9 +25,16 @@ public class AbstrHeapTest {
     private final TestData T4 = new TestData(4);
     private final TestData T5 = new TestData(5);
 
+    private final Comparator<TestData> komparator = new Comparator<TestData>() {
+        @Override
+        public int compare(TestData o1, TestData o2) {
+            return o1.compareTo(o2);
+        }
+    };
+
     @Before
     public void setUp() {
-        abstrHeap = new AbstrHeap<>();
+        abstrHeap = new AbstrHeap<>(komparator);
     }
 
 

@@ -1,6 +1,6 @@
 package pinkas.michael.sem.c.data;
 
-public class Zamek implements Comparable {
+public class Zamek {
 
     private static int pocetZamku = 0;
 
@@ -45,11 +45,5 @@ public class Zamek implements Comparable {
                 ", nazevPamatky='" + nazevPamatky + '\'' +
                 ", gps='" + gps + '\'' +
                 '}';
-    }
-
-
-    @Override
-    public int compareTo(Object o) {
-        return 0;
     }
 }

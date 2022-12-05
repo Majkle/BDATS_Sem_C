@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 import pinkas.michael.sem.c.data.Zamek;
 import pinkas.michael.sem.c.pamatky.eTypKey;
 import pinkas.michael.sem.c.ui.Operace;
+import pinkas.michael.sem.c.util.Komparatory;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -26,7 +27,7 @@ public class ProgHeap extends Application {
     }
 
 
-    private static final int SCENE_WIDTH = 800;
+    private static final int SCENE_WIDTH = 900;
     private static final int SCENE_HEIGHT = 600;
 
     private final Operace operace = new Operace(this::alertInfo, this::alertError);
@@ -60,9 +61,12 @@ public class ProgHeap extends Application {
 
     /*------*/
 
+    private final ListView<Zamek> listViewPrioritniFronta = new ListView<>();
     private final Button bVybuduj = new Button("Vybuduj");
     private final Button bPrebudujFrontu = new Button("Přebuduj");
     private final Button bZrusFrontu = new Button("Zruš");
+    private final TextField tfXPrioritniFronta = new TextField();
+    private final TextField tfYPrioritniFronta = new TextField();
     private final Button bVlozDoFronty = new Button("Vlož");
     private final Button bOdeberMax = new Button("Odeber max");
     private final Button bZpristupniMax = new Button("Zpřístupni max");
@@ -78,13 +82,18 @@ public class ProgHeap extends Application {
         stage.setTitle("Výrobní proces");
         stage.show();
 
-        root.setCenter(listView);
+        root.setLeft(listView);
+        root.setRight(listViewPrioritniFronta);
         root.setTop(flowPaneHorniNavigace);
         root.setBottom(flowPaneDolniNavigace);
 
         listView.addEventFilter(MouseEvent.MOUSE_PRESSED, Event::consume);
+        listView.setPrefWidth(450);
+        listViewPrioritniFronta.addEventFilter(MouseEvent.MOUSE_PRESSED, Event::consume);
+        listViewPrioritniFronta.setPrefWidth(450);
 
-        flowPaneHorniNavigace.getChildren().addAll(new Label("AbstrTable:"), bVloz, bOdeber, bNajdi, tfKlic,
+        flowPaneHorniNavigace.getChildren().addAll(
+                new Label("AbstrTable:"), bVloz, bOdeber, bNajdi, tfKlic,
                 new Label("|"), bNejblizsi, tfX, tfY,
                 new Label("|"), bNastavKlic, cbKlice,
                 new Label("|"), bPrebuduj,
@@ -97,7 +106,11 @@ public class ProgHeap extends Application {
         flowPaneHorniNavigace.setVgap(10);
         flowPaneHorniNavigace.alignmentProperty().set(Pos.CENTER);
 
-        flowPaneDolniNavigace.getChildren().addAll(new Label("AbstrHeap:"), bVybuduj, bPrebudujFrontu, bZrusFrontu, new Label("|"), bVlozDoFronty, bOdeberMax, bZpristupniMax, new Label("|"), bExportFronty, bImportFronty, tfSouborFronty);
+        flowPaneDolniNavigace.getChildren().addAll(
+                new Label("AbstrHeap:"), bVybuduj, bPrebudujFrontu, bZrusFrontu,
+                new Label("|"), tfXPrioritniFronta, tfYPrioritniFronta,
+                new Label("|"), bVlozDoFronty, bOdeberMax, bZpristupniMax,
+                new Label("|"), bExportFronty, bImportFronty, tfSouborFronty);
         flowPaneDolniNavigace.setPadding(new Insets(10));
         flowPaneDolniNavigace.setHgap(10);
         flowPaneDolniNavigace.setVgap(10);
@@ -123,7 +136,7 @@ public class ProgHeap extends Application {
             operace.najdiNejblizsi(Double.parseDouble(tfX.getText()), Double.parseDouble(tfY.getText()));
             aktualizujListView();
         });
-//TODO obrázek 4 patra + hledání podle X Y
+
         tfKlic.setPromptText("klíč");
 
         tfX.setPromptText("x");
@@ -169,7 +182,66 @@ public class ProgHeap extends Application {
 
         /*---*/
 
-//        bVybuduj.setOnAction(actionEvent -> operace.);
+        bVybuduj.setOnAction(actionEvent -> {
+            operace.vybuduj();
+            aktualizujListViewPrioritniFronty();
+        });
+
+        bPrebuduj.setOnAction(actionEvent -> {
+            operace.prebudujFrontu();
+            aktualizujListViewPrioritniFronty();
+        });
+
+        bZrus.setOnAction(actionEvent -> {
+            operace.zrusFrontu();
+            aktualizujListViewPrioritniFronty();
+        });
+
+        tfXPrioritniFronta.setPromptText("Lon");
+        tfXPrioritniFronta.setMaxWidth(50);
+        tfXPrioritniFronta.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                double novaLon = Double.parseDouble(newValue);
+                if (novaLon < 180 && novaLon > -180) {
+                    Komparatory.setAktualniLon(novaLon);
+                    operace.prebudujFrontu();
+                    aktualizujListViewPrioritniFronty();
+                }
+            } catch (Exception e) {
+            }
+        });
+
+        tfYPrioritniFronta.setPromptText("Lat");
+        tfYPrioritniFronta.setMaxWidth(50);
+        tfYPrioritniFronta.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                double novaLat = Double.parseDouble(newValue);
+                if (novaLat < 90 && novaLat > -90) {
+                    Komparatory.setAktualniLat(novaLat);
+                    operace.prebudujFrontu();
+                    aktualizujListViewPrioritniFronty();
+                }
+            } catch (Exception e) {
+
+            }
+        });
+
+        bVlozDoFronty.setOnAction(actionEvent -> {
+            Optional<Zamek> novy = ZamekDialog.zobrazDejDialog();
+            novy.ifPresent(operace::vlozDoFronty);
+            aktualizujListViewPrioritniFronty();
+        });
+
+        bOdeberMax.setOnAction(actionEvent -> {
+            operace.odeberMax();
+            aktualizujListViewPrioritniFronty();
+        });
+
+        bZpristupniMax.setOnAction(actionEvent -> operace.zpristupniMax());
+
+        bExportFronty.setOnAction(actionEvent -> operace.exportDatPrioritniFronta(tfSouborFronty.getText()));
+
+        bImportFronty.setOnAction(actionEvent -> operace.importDatPrioritniFronta(tfSouborFronty.getText()));
     }
 
 
@@ -180,6 +252,15 @@ public class ProgHeap extends Application {
         operace.iterator().forEachRemaining(list::add);
 
         listView.getItems().setAll(list);
+    }
+
+    private void aktualizujListViewPrioritniFronty() {
+        listViewPrioritniFronta.getItems().clear();
+
+        List<Zamek> list = new LinkedList<>();
+        operace.iteratorPrioritniFronta().forEachRemaining(list::add);
+
+        listViewPrioritniFronta.getItems().setAll(list);
     }
 
     private void alertInfo(String msg) {
