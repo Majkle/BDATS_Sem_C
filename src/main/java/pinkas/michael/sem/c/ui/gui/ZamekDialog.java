@@ -38,6 +38,7 @@ public class ZamekDialog {
     }
 
     public static Optional<Zamek> zobrazDejDialog() {
+        dialog.setTitle("Nový zámek");
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == okButton) {
                 return dejNovyZamek();

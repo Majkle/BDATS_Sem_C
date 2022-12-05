@@ -35,14 +35,14 @@ public interface IAbstrHeap<T extends Comparable<T>> {
     void vloz(T vkladany);
 
     /**
-     * Odebere prvek s nejvyšší hodnout.
+     * Odebere prvek s nejvyšší prioritou.
      *
      * @return odebraný prvek
      */
     T odeberMax();
 
     /**
-     * Zpřístupní prvke s nejvyšší hodnoutou.
+     * Zpřístupní prvke s nejvyšší prioroitou.
      *
      * @return nalezený prvek
      */

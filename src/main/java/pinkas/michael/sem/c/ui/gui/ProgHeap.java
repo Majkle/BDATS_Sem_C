@@ -12,6 +12,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 import pinkas.michael.sem.c.data.Zamek;
+import pinkas.michael.sem.c.pamatky.eTypKey;
 import pinkas.michael.sem.c.ui.Operace;
 
 import java.util.LinkedList;
@@ -43,6 +44,7 @@ public class ProgHeap extends Application {
     private final TextField tfY = new TextField();
 
     private final Button bNastavKlic = new Button("Nastav");
+    private final ComboBox<eTypKey> cbKlice = new ComboBox<>(FXCollections.observableArrayList(eTypKey.values()));
 
     private final Button bPrebuduj = new Button("Přebuduj");
 
@@ -55,6 +57,18 @@ public class ProgHeap extends Application {
     private final Button bExport = new Button("Ulož");
     private final TextField tfSoubor = new TextField();
     private final Button bZrus = new Button("Zruš");
+
+    /*------*/
+
+    private final Button bVybuduj = new Button("Vybuduj");
+    private final Button bPrebudujFrontu = new Button("Přebuduj");
+    private final Button bZrusFrontu = new Button("Zruš");
+    private final Button bVlozDoFronty = new Button("Vlož");
+    private final Button bOdeberMax = new Button("Odeber max");
+    private final Button bZpristupniMax = new Button("Zpřístupni max");
+    private final Button bImportFronty = new Button("Načti");
+    private final Button bExportFronty = new Button("Ulož");
+    private final TextField tfSouborFronty = new TextField();
 
 
     @Override
@@ -70,20 +84,23 @@ public class ProgHeap extends Application {
 
         listView.addEventFilter(MouseEvent.MOUSE_PRESSED, Event::consume);
 
-        flowPaneHorniNavigace.getChildren().addAll(bVloz, bOdeber, bNajdi, tfKlic,
+        flowPaneHorniNavigace.getChildren().addAll(new Label("AbstrTable:"), bVloz, bOdeber, bNajdi, tfKlic,
                 new Label("|"), bNejblizsi, tfX, tfY,
-                new Label("|"), bNastavKlic,
-                new Label("|"), bPrebuduj);
-        flowPaneHorniNavigace.setPadding(new Insets(10));
-        flowPaneHorniNavigace.setHgap(10);
-        flowPaneHorniNavigace.alignmentProperty().set(Pos.CENTER);
-
-        flowPaneDolniNavigace.getChildren().addAll(bVypisStromu,
+                new Label("|"), bNastavKlic, cbKlice,
+                new Label("|"), bPrebuduj,
+                new Label("|"), bVypisStromu,
                 new Label("|"), bGenerator, spinnerGenerujPocet,
                 new Label("|"), bImport, bExport, tfSoubor,
                 new Label("|"), bZrus);
+        flowPaneHorniNavigace.setPadding(new Insets(10));
+        flowPaneHorniNavigace.setHgap(10);
+        flowPaneHorniNavigace.setVgap(10);
+        flowPaneHorniNavigace.alignmentProperty().set(Pos.CENTER);
+
+        flowPaneDolniNavigace.getChildren().addAll(new Label("AbstrHeap:"), bVybuduj, bPrebudujFrontu, bZrusFrontu, new Label("|"), bVlozDoFronty, bOdeberMax, bZpristupniMax, new Label("|"), bExportFronty, bImportFronty, tfSouborFronty);
         flowPaneDolniNavigace.setPadding(new Insets(10));
         flowPaneDolniNavigace.setHgap(10);
+        flowPaneDolniNavigace.setVgap(10);
         flowPaneDolniNavigace.alignmentProperty().set(Pos.CENTER);
 
         bVloz.setOnAction(actionEvent -> {
@@ -115,6 +132,13 @@ public class ProgHeap extends Application {
         tfY.setPromptText("y");
         tfY.setMaxWidth(50);
 
+        bNastavKlic.setOnAction(actionEvent -> {
+            operace.nastavKlic(cbKlice.getSelectionModel().getSelectedItem());
+            aktualizujListView();
+        });
+
+        cbKlice.getSelectionModel().selectFirst();
+
         bPrebuduj.setOnAction(actionEvent -> {
             operace.prebuduj();
             aktualizujListView();
@@ -142,6 +166,10 @@ public class ProgHeap extends Application {
         });
 
         tfSoubor.setText("src/main/resources/vzorovy.txt");
+
+        /*---*/
+
+//        bVybuduj.setOnAction(actionEvent -> operace.);
     }
 
 

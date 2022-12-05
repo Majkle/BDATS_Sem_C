@@ -1,21 +1,154 @@
 package pinkas.michael.sem.c.struktury.heap;
 
+import pinkas.michael.sem.c.struktury.bvs.AbstrTable;
+import pinkas.michael.sem.c.struktury.bvs.AbstrTableException;
+import pinkas.michael.sem.c.struktury.lifo.AbstrLifo;
+
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class AbstrHeap<T extends Comparable<T>> implements IAbstrHeap<T> {
 
     private T[] prioritniFronta;
 
+    @Override
+    public void vybuduj(T[] zamky) {
+        if (zamky == null) {
+            throw new AbstrHeapException("Žádná data pro vložení");
+        }
+
+        prioritniFronta = zamky;
+        _prebuduj();
+    }
+
+    @Override
+    public void prebuduj() {
+        if (!_jePrazdny()) {
+            _prebuduj();
+        }
+    }
+
+    @Override
+    public void zrus() {
+        prioritniFronta = null;
+    }
+
+    @Override
+    public boolean jePrazdny() {
+        return _jePrazdny();
+    }
+
+    @Override
+    public void vloz(T vkladany) {
+        if (vkladany == null) {
+            throw new AbstrHeapException("Žádná data pro vložení");
+        }
+
+        if (_jePrazdny()) {
+            prioritniFronta = (T[]) new Comparable[]{vkladany};
+        } else {
+            prioritniFronta = Arrays.copyOf(prioritniFronta, prioritniFronta.length + 1);
+
+            int iZarazeni = 0;
+            while (prioritniFronta[iZarazeni].compareTo(vkladany) > 0) {
+                iZarazeni++;
+                if (iZarazeni == prioritniFronta.length - 1) {
+                    break;
+                }
+            }
+
+            T prevValue = vkladany;
+
+            for (int i = iZarazeni; i < prioritniFronta.length; i++) {
+                T tmp = prevValue;
+                prevValue = prioritniFronta[i];
+                prioritniFronta[i] = tmp;
+            }
+        }
+    }
+
+    @Override
+    public T odeberMax() {
+        if (_jePrazdny()) {
+            return null;
+        }
+
+        T odebirany = prioritniFronta[prioritniFronta.length - 1];
+        prioritniFronta = Arrays.copyOf(prioritniFronta, prioritniFronta.length - 1);
+        return odebirany;
+    }
+
+    @Override
+    public T zpristupniMax() {
+        if (_jePrazdny()) {
+            return null;
+        }
+
+        return prioritniFronta[prioritniFronta.length - 1];
+    }
+
+    @Override
+    public Iterator<T> iterator(eTypProhl typProhlidky) {
+        Iterator<T> it;
+        switch (typProhlidky) {
+            case SIRKA -> it = Arrays.stream(prioritniFronta).iterator();
+            case HLOUBKA -> it = new Iterator<T>() {
+                AbstrLifo<Integer> zasobnik = new AbstrLifo<>();
+
+                {
+                    if (!_jePrazdny()) {
+                        int pozice = 0;
+                        while (pozice <= prioritniFronta.length - 1) {
+                            zasobnik.vloz(pozice);
+                            pozice = pozice * 2 + 1;
+                        }
+                    }
+                }
+
+                @Override
+                public boolean hasNext() {
+                    return !zasobnik.jePrazdny();
+                }
+
+                @Override
+                public T next() {
+                    if (hasNext()) {
+                        int dalsi = zasobnik.odeber();
+
+                        int pozice = dalsi * 2 + 2;
+                        if (pozice < prioritniFronta.length) {
+                            while (pozice < prioritniFronta.length) {
+                                zasobnik.vloz(pozice);
+                                pozice = pozice * 2 + 1;
+                            }
+                        }
+
+                        return prioritniFronta[dalsi];
+                    } else {
+                        throw new NoSuchElementException("Žádný další klíč");
+                    }
+                }
+            };
+            default -> throw new AbstrHeapException("Nepodporovaný druh iterátoru");
+        }
+
+        return it;
+    }
+
+    private boolean _jePrazdny() {
+        return prioritniFronta == null || prioritniFronta.length == 0;
+    }
+
     private void _prebuduj() {
         int velikostPole = prioritniFronta.length;
         // Index of last non-leaf node
-        int polovinaPole = velikostPole / 2;
+        int polovinaVelikostiPole = velikostPole / 2;
 
         // Perform reverse level order traversal
         // from last non-leaf node and heapify
         // each node
-        for (int aktualniKoren = polovinaPole - 1; aktualniKoren >= 0; aktualniKoren--) {
+        for (int aktualniKoren = polovinaVelikostiPole - 1; aktualniKoren >= 0; aktualniKoren--) {
             heapify(prioritniFronta, velikostPole, aktualniKoren);
         }
 
@@ -38,6 +171,8 @@ public class AbstrHeap<T extends Comparable<T>> implements IAbstrHeap<T> {
         int iLevy = 2 * aktualniKoren + 1; // left = 2*i + 1
         int iPravy = 2 * aktualniKoren + 2; // right = 2*i + 2
 
+        //TODO comparator
+
         // If left child is larger than root
         if (iLevy < velikostPole && pole[iLevy].compareTo(pole[iNejmensi]) < 0)
             iNejmensi = iLevy;
@@ -55,49 +190,5 @@ public class AbstrHeap<T extends Comparable<T>> implements IAbstrHeap<T> {
             // Recursively heapify the affected sub-tree
             heapify(pole, velikostPole, iNejmensi);
         }
-    }
-
-    @Override
-    public void vybuduj(T[] zamky) {
-        prioritniFronta = zamky;
-        _prebuduj();
-    }
-
-    @Override
-    public void prebuduj() {
-        _prebuduj();
-    }
-
-    @Override
-    public void zrus() {
-        prioritniFronta = null;
-    }
-
-    @Override
-    public boolean jePrazdny() {
-        return prioritniFronta == null || prioritniFronta.length == 0;
-    }
-
-    @Override
-    public void vloz(T vkladany) {
-        prioritniFronta = Arrays.copyOf(prioritniFronta, prioritniFronta.length + 1);
-        prioritniFronta[prioritniFronta.length - 1] = vkladany;
-    }
-
-    @Override
-    public T odeberMax() {
-        T odebirany = prioritniFronta[prioritniFronta.length - 1];
-        prioritniFronta = Arrays.copyOf(prioritniFronta, prioritniFronta.length - 1);
-        return odebirany;
-    }
-
-    @Override
-    public T zpristupniMax() {
-        return prioritniFronta[prioritniFronta.length - 1];
-    }
-
-    @Override
-    public Iterator<T> iterator(eTypProhl typProhlidky) {
-        return Arrays.stream(prioritniFronta).iterator();
     }
 }
