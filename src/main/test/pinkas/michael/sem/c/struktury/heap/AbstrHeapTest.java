@@ -48,6 +48,10 @@ public class AbstrHeapTest {
 
 
     private boolean jeOcekavanyObsahFronty(TestData[] ocekavany, AbstrHeap<TestData> vysledek) {
+
+        Iterator<TestData> it = vysledek.iterator(eTypProhl.SIRKA);
+        it.forEachRemaining(System.out::println);
+
         Iterator<TestData> iterator = vysledek.iterator(eTypProhl.SIRKA);
 
         for (int i = 0; i < ocekavany.length; i++) {
@@ -669,14 +673,9 @@ public class AbstrHeapTest {
 
     @Test
     public void abstrHeapTest_iterator_hloubka_prazdnyStrom() {
-        ocekavanaVyjimka.expect(NoSuchElementException.class);
-        ocekavanaVyjimka.expectMessage("Žádný další klíč");
-
-
         Iterator<TestData> it = abstrHeap.iterator(eTypProhl.HLOUBKA);
 
-        assertFalse(it.hasNext());
-        it.next();
+        assertNull(it);
     }
 
     @Test

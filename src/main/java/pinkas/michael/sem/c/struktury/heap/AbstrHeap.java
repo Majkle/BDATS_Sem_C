@@ -2,10 +2,7 @@ package pinkas.michael.sem.c.struktury.heap;
 
 import pinkas.michael.sem.c.struktury.lifo.AbstrLifo;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 public class AbstrHeap<T> implements IAbstrHeap<T> {
 
@@ -151,52 +148,39 @@ public class AbstrHeap<T> implements IAbstrHeap<T> {
 
     private void _prebuduj() {
         int velikostPole = prioritniFronta.length;
-        // Index of last non-leaf node
         int polovinaVelikostiPole = velikostPole / 2;
 
-        // Perform reverse level order traversal
-        // from last non-leaf node and heapify
-        // each node
         for (int aktualniKoren = polovinaVelikostiPole - 1; aktualniKoren >= 0; aktualniKoren--) {
             heapify(prioritniFronta, velikostPole, aktualniKoren);
         }
 
-        // One by one extract an element from heap
-        for (int aktualniKoren = velikostPole - 1; aktualniKoren >= 0; aktualniKoren--) {
-            // Move current root to end
+        for (int aktualniPosledniPrvek = velikostPole - 1; aktualniPosledniPrvek >= 0; aktualniPosledniPrvek--) {
             T tmp = prioritniFronta[0];
-            prioritniFronta[0] = prioritniFronta[aktualniKoren];
-            prioritniFronta[aktualniKoren] = tmp;
+            prioritniFronta[0] = prioritniFronta[aktualniPosledniPrvek];
+            prioritniFronta[aktualniPosledniPrvek] = tmp;
 
-            // call max heapify on the reduced heap
-            heapify(prioritniFronta, aktualniKoren, 0);
+            heapify(prioritniFronta, aktualniPosledniPrvek, 0);
         }
     }
 
-    // To heapify a subtree rooted with node i which is
-    // an index in arr[]. n is size of heap
     private void heapify(T[] pole, int velikostPole, int aktualniKoren) {
-        int iNejmensi = aktualniKoren; // Initialize largest as root
-        int iLevy = 2 * aktualniKoren + 1; // left = 2*i + 1
-        int iPravy = 2 * aktualniKoren + 2; // right = 2*i + 2
+        int iNejmensi = aktualniKoren;
+        int iLevy = 2 * aktualniKoren + 1;
+        int iPravy = 2 * aktualniKoren + 2;
 
-        // If left child is larger than root
         if (iLevy < velikostPole && komparator.compare(pole[iLevy], pole[iNejmensi]) < 0) {
             iNejmensi = iLevy;
         }
 
-        // If right child is larger than largest so far
         if (iPravy < velikostPole && komparator.compare(pole[iPravy], pole[iNejmensi]) < 0) {
             iNejmensi = iPravy;
         }
 
-        // If largest is not root
         if (iNejmensi != aktualniKoren) {
             T tmp = pole[aktualniKoren];
             pole[aktualniKoren] = pole[iNejmensi];
             pole[iNejmensi] = tmp;
 
-            // Recursively heapify the affected sub-tree
             heapify(pole, velikostPole, iNejmensi);
         }
     }
